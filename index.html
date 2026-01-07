@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025 Financial Report Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #1a3a8f 0%, #2d5cc2 100%);
+            color: white;
+            padding: 30px 0;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .logo-container {
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo {
+            height: 80px;
+            width: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .logo-text {
+            font-weight: 700;
+            margin-left: 10px;
+            font-size: 1rem;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #2d5cc2;
+        }
+        
+        .expense-card .card-icon {
+            color: #e74c3c;
+        }
+        
+        .profit-card .card-icon {
+            color: #27ae60;
+        }
+        
+        .location-card .card-icon {
+            color: #8e44ad;
+        }
+        
+        .card-title {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        .card-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #1a3a8f;
+            margin-bottom: 10px;
+        }
+        
+        .expense-card .card-value {
+            color: #e74c3c;
+        }
+        
+        .profit-card .card-value {
+            color: #27ae60;
+        }
+        
+        .location-card .card-value {
+            color: #8e44ad;
+        }
+        
+        .card-detail {
+            font-size: 0.95rem;
+            color: #777;
+        }
+        
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .chart-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .chart-title {
+            font-size: 1.4rem;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .chart-title i {
+            color: #2d5cc2;
+        }
+        
+        .expense-chart-title i {
+            color: #e74c3c;
+        }
+        
+        .location-chart-title i {
+            color: #8e44ad;
+        }
+        
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+        
+        .data-table-container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 40px;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            color: #1a3a8f;
+            font-weight: 600;
+            padding: 15px;
+            text-align: left;
+            border-bottom: 2px solid #eaeaea;
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        tr:hover {
+            background-color: #f9fafc;
+        }
+        
+        .month-cell {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .year-cell {
+            color: #666;
+        }
+        
+        .amount-cell {
+            font-weight: 600;
+            color: #1a3a8f;
+        }
+        
+        .expense-cell {
+            font-weight: 600;
+            color: #e74c3c;
+        }
+        
+        .profit-cell {
+            font-weight: 600;
+            color: #27ae60;
+        }
+        
+        .deliveries-cell {
+            text-align: center;
+            font-weight: 600;
+            color: #2d5cc2;
+            background-color: #f0f5ff;
+            border-radius: 5px;
+            padding: 5px 10px;
+            display: inline-block;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 25px;
+            color: #666;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+            margin-top: 20px;
+        }
+        
+        .highlight {
+            color: #2d5cc2;
+            font-weight: 600;
+        }
+        
+        .expense-highlight {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+        
+        .profit-highlight {
+            color: #27ae60;
+            font-weight: 600;
+        }
+        
+        .location-highlight {
+            color: #8e44ad;
+            font-weight: 600;
+        }
+        
+        .month-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .month-btn {
+            padding: 10px 20px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .month-btn:hover {
+            background-color: #f0f5ff;
+        }
+        
+        .month-btn.active {
+            background-color: #2d5cc2;
+            color: white;
+            border-color: #2d5cc2;
+        }
+        
+        .month-details {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            display: none;
+        }
+        
+        .month-details.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .details-title {
+            font-size: 1.6rem;
+            color: #1a3a8f;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .detail-item {
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #f8f9fa;
+        }
+        
+        .expense-detail-item {
+            background-color: #fff5f5;
+        }
+        
+        .profit-detail-item {
+            background-color: #f0fff4;
+        }
+        
+        .location-detail-item {
+            background-color: #f9f0ff;
+        }
+        
+        .detail-label {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .detail-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .expense-detail-item .detail-value {
+            color: #e74c3c;
+        }
+        
+        .profit-detail-item .detail-value {
+            color: #27ae60;
+        }
+        
+        .location-detail-item .detail-value {
+            color: #8e44ad;
+        }
+        
+        /* New expense cards section */
+        .expense-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        /* NEW: Location Coverage Section */
+        .location-coverage {
+            margin-bottom: 40px;
+        }
+        
+        .location-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .location-progress-container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .location-item {
+            margin-bottom: 20px;
+        }
+        
+        .location-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .location-name {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .location-percentage {
+            font-weight: 700;
+            color: #8e44ad;
+        }
+        
+        .progress-bar {
+            height: 12px;
+            background-color: #f0f0f0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 1.5s ease-in-out;
+        }
+        
+        /* Color coding for different locations */
+        .delta-fill { background-color: #3498db; width: 0%; }
+        .edo-fill { background-color: #2ecc71; width: 0%; }
+        .anambra-fill { background-color: #e74c3c; width: 0%; }
+        .lagos-fill { background-color: #f39c12; width: 0%; }
+        .portharcourt-fill { background-color: #9b59b6; width: 0%; }
+        .abuja-fill { background-color: #1abc9c; width: 0%; }
+        
+        /* Responsive styles */
+        @media (max-width: 1200px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-card {
+                padding: 15px;
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .expense-summary {
+                grid-template-columns: 1fr;
+            }
+            
+            .location-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .month-selector {
+                gap: 8px;
+            }
+            
+            .month-btn {
+                padding: 8px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .logo-container {
+                position: relative;
+                top: 0;
+                left: 0;
+                justify-content: center;
+                margin-bottom: 15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            
+            header {
+                padding: 20px 0;
+                border-radius: 10px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .chart-card {
+                padding: 15px;
+            }
+            
+            .card-value {
+                font-size: 1.8rem;
+            }
+            
+            .location-progress-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <img src="logo1.png" alt="Company Logo" class="logo">
+                <div class="logo-text"></div>
+            </div>
+            <div class="header-content">
+                <h1>Korrect Logistics E-commerce Remmittance Report 2025</h1>
+                <p class="subtitle">Cash Flow Analysis, Cash Remitted, Expenses, Delivery Statistics & Geographical Coverage</p>
+            </div>
+        </header>
+        
+        <div class="summary-cards">
+            <div class="card">
+                <div class="card-icon">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div class="card-title">Total Cash Received</div>
+                <div class="card-value">₦200,761,164</div>
+                <div class="card-detail">From January to December 2025</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-icon">
+                    <i class="fas fa-truck"></i>
+                </div>
+                <div class="card-title">Total Deliveries Made</div>
+                <div class="card-value">9,587</div>
+                <div class="card-detail">From January to December 2025</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-icon">
+                    <i class="fas fa-hand-holding-usd"></i>
+                </div>
+                <div class="card-title">Total Cash Remitted</div>
+                <div class="card-value">₦188,227,889</div>
+                <div class="card-detail">From January to December 2025</div>
+            </div>
+        </div>
+        
+        <!-- NEW: Location Coverage Card -->
+        <div class="summary-cards">
+            <div class="card location-card">
+                <div class="card-icon">
+                    <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <div class="card-title">Geographical Coverage</div>
+                <div class="card-value">6 States</div>
+                <div class="card-detail">Delta, Edo, Anambra, Lagos, Port Harcourt, Abuja FCT</div>
+            </div>
+            
+            <div class="card expense-card">
+                <div class="card-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="card-title">Total Operating Expenses</div>
+                <div class="card-value">₦23,441,874</div>
+                <div class="card-detail">From January to December 2025</div>
+            </div>
+            
+            <div class="card profit-card">
+                <div class="card-icon">
+                    <i class="fas fa-chart-pie"></i>
+                </div>
+                <div class="card-title">Net Operational Balance</div>
+                <div class="card-value">₦10,908,599</div>
+                <div class="card-detail">(Cash remitted + expenses) - Cash received</div>
+            </div>
+        </div>
+        
+        <!-- NEW: Location Coverage Section -->
+        <div class="location-coverage">
+            <div class="chart-title location-chart-title">
+                <i class="fas fa-map"></i>
+                Geographical Coverage Analysis
+            </div>
+            
+            <div class="location-grid">
+                <div class="location-progress-container">
+                    <div class="chart-title">
+                        <i class="fas fa-chart-pie"></i>
+                        Service Coverage by State
+                    </div>
+                    
+                    <div class="location-item">
+                        <div class="location-header">
+                            <span class="location-name">Delta State</span>
+                            <span class="location-percentage">68%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill delta-fill" data-percentage="68"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="location-item">
+                        <div class="location-header">
+                            <span class="location-name">Edo State</span>
+                            <span class="location-percentage">10%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill edo-fill" data-percentage="10"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="location-item">
+                        <div class="location-header">
+                            <span class="location-name">Anambra State</span>
+                            <span class="location-percentage">8%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill anambra-fill" data-percentage="8"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="location-item">
+                        <div class="location-header">
+                            <span class="location-name">Lagos State</span>
+                            <span class="location-percentage">6%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill lagos-fill" data-percentage="6"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="location-item">
+                        <div class="location-header">
+                            <span class="location-name">Port Harcourt</span>
+                            <span class="location-percentage">3%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill portharcourt-fill" data-percentage="3"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="location-item">
+                        <div class="location-header">
+                            <span class="location-name">FCT Abuja</span>
+                            <span class="location-percentage">5%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill abuja-fill" data-percentage="5"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-title location-chart-title">
+                        <i class="fas fa-globe-africa"></i>
+                        Coverage Distribution
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="coverageChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="month-selector">
+            <button class="month-btn active" data-month="all">All Months</button>
+            <button class="month-btn" data-month="jan">January</button>
+            <button class="month-btn" data-month="feb">February</button>
+            <button class="month-btn" data-month="mar">March</button>
+            <button class="month-btn" data-month="apr">April</button>
+            <button class="month-btn" data-month="may">May</button>
+            <button class="month-btn" data-month="jun">June</button>
+            <button class="month-btn" data-month="jul">July</button>
+            <button class="month-btn" data-month="aug">August</button>
+            <button class="month-btn" data-month="sep">September</button>
+            <button class="month-btn" data-month="oct">October</button>
+            <button class="month-btn" data-month="nov">November</button>
+            <button class="month-btn" data-month="dec">December</button>
+        </div>
+        
+        <div id="monthDetails" class="month-details active">
+            <div class="details-title">
+                <i class="fas fa-calendar-alt"></i>
+                Annual Overview (January to December 2025)
+            </div>
+            <div class="details-grid">
+                <div class="detail-item">
+                    <div class="detail-label">Total Cash Received</div>
+                    <div class="detail-value">₦200,761,164</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Total Cash Remitted</div>
+                    <div class="detail-value">₦188,227,889</div>
+                </div>
+                <div class="detail-item expense-detail-item">
+                    <div class="detail-label">Total Operating Expenses</div>
+                    <div class="detail-value">₦23,441,874</div>
+                </div>
+                <div class="detail-item profit-detail-item">
+                    <div class="detail-label">Net Operational Balance</div>
+                    <div class="detail-value">₦10,908,599</div>
+                </div>
+                <div class="detail-item location-detail-item">
+                    <div class="detail-label">States Covered</div>
+                    <div class="detail-value">6 States</div>
+                </div>
+                <div class="detail-item location-detail-item">
+                    <div class="detail-label">Primary Coverage</div>
+                    <div class="detail-value">Delta (68%)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="charts-container">
+            <div class="chart-card">
+                <div class="chart-title">
+                    <i class="fas fa-chart-line"></i>
+                    Monthly Cash Received vs Cash Remitted
+                </div>
+                <div class="chart-container">
+                    <canvas id="cashFlowChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-card">
+                <div class="chart-title">
+                    <i class="fas fa-chart-bar"></i>
+                    Monthly Deliveries Made
+                </div>
+                <div class="chart-container">
+                    <canvas id="deliveriesChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- NEW: Expense Chart -->
+        <div class="charts-container">
+            <div class="chart-card">
+                <div class="chart-title expense-chart-title">
+                    <i class="fas fa-chart-area"></i>
+                    Monthly Operating Expenses
+                </div>
+                <div class="chart-container">
+                    <canvas id="expensesChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-card">
+                <div class="chart-title">
+                    <i class="fas fa-balance-scale"></i>
+                    Monthly Cash vs Total Outflows
+                </div>
+                <div class="chart-container">
+                    <canvas id="balanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="data-table-container">
+            <div class="chart-title">
+                <i class="fas fa-table"></i>
+                Monthly Financial Data
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th>Year</th>
+                        <th>Cash Received</th>
+                        <th>Cash Remitted</th>
+                        <th>Operating Expenses</th>
+                        <th>Deliveries Made</th>
+                    </tr>
+                </thead>
+                <tbody id="data-table-body">
+                    <!-- Data will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="footer">
+            <p>2025 Financial Report Dashboard • Generated from Korrect Logistics official financial data</p>
+            <p>Cash flow analysis showing <span class="highlight">₦200,761,164</span> received, 
+            <span class="highlight">₦188,227,889</span> cash remitted, 
+            <span class="expense-highlight">₦23,441,874</span> in operating expenses with 
+            <span class="highlight">9,587</span> total deliveries across 
+            <span class="location-highlight">6 states</span>.</p>
+            <p>Geographical coverage: Delta (68%), Edo (10%), Anambra (8%), Lagos (6%), Port Harcourt (3%), Abuja FCT (5%)</p>
+            <p>Net operational balance: <span class="profit-highlight">₦10,908,599</span></p>
+        </div>
+    </div>
+
+    <script>
+        // Data from the image
+        const financialData = [
+            { month: "JANUARY", year: 2025, cashReceived: 11347775, cashRemitted: 11357823, deliveries: 594 },
+            { month: "FEBRUARY", year: 2025, cashReceived: 11082627, cashRemitted: 9943046, deliveries: 592 },
+            { month: "MARCH", year: 2025, cashReceived: 13583459, cashRemitted: 11917107, deliveries: 667 },
+            { month: "APRIL", year: 2025, cashReceived: 17038867, cashRemitted: 15496128, deliveries: 690 },
+            { month: "MAY", year: 2025, cashReceived: 14081883, cashRemitted: 12841357, deliveries: 883 },
+            { month: "JUNE", year: 2025, cashReceived: 14960469, cashRemitted: 13383195, deliveries: 831 },
+            { month: "JULY", year: 2025, cashReceived: 21677554, cashRemitted: 20443169, deliveries: 988 },
+            { month: "AUGUST", year: 2025, cashReceived: 21068035, cashRemitted: 20448494, deliveries: 914 },
+            { month: "SEPTEMBER", year: 2025, cashReceived: 23290720, cashRemitted: 22294459, deliveries: 896 },
+            { month: "OCTOBER", year: 2025, cashReceived: 20495230, cashRemitted: 19910185, deliveries: 1052 },
+            { month: "NOVEMBER", year: 2025, cashReceived: 17485440, cashRemitted: 169111388, deliveries: 848 },
+            { month: "DECEMBER", year: 2025, cashReceived: 14639057, cashRemitted: 13291836, deliveries: 632 }
+        ];
+        
+        // NEW: Expense data
+        const expenseData = [
+            1551080, 1738080, 1631160, 2045114, 2244090, 2002990,
+            2223250, 1893640, 1971870, 2054640, 2138170, 1947790
+        ];
+        
+        // NEW: Location coverage data
+        const locationData = [
+            { name: "Delta State", percentage: 68, color: '#3498db' },
+            { name: "Edo State", percentage: 10, color: '#2ecc71' },
+            { name: "Anambra State", percentage: 8, color: '#e74c3c' },
+            { name: "Lagos State", percentage: 6, color: '#f39c12' },
+            { name: "Port Harcourt", percentage: 3, color: '#9b59b6' },
+            { name: "FCT Abuja", percentage: 5, color: '#1abc9c' }
+        ];
+        
+        // Calculate totals with updated formula for net balance
+        const totalCashReceived = 200761164;
+        const totalCashRemitted = 188227889;
+        const totalDeliveries = 9587;
+        const totalExpenses = 23441874;
+        const totalOutflows = totalCashRemitted + totalExpenses;
+        // UPDATED: Net balance = (Cash remitted + expenses) - Cash received
+        const netBalance = totalOutflows - totalCashReceived;
+        
+        // Format currency in Naira
+        function formatCurrency(amount) {
+            return '₦' + new Intl.NumberFormat('en-US').format(amount);
+        }
+        
+        // Format number with commas
+        function formatNumber(num) {
+            return new Intl.NumberFormat('en-US').format(num);
+        }
+        
+        // NEW: Animate progress bars
+        function animateProgressBars() {
+            const progressBars = document.querySelectorAll('.progress-fill');
+            progressBars.forEach(bar => {
+                const percentage = bar.getAttribute('data-percentage');
+                // Set the width after a small delay to trigger animation
+                setTimeout(() => {
+                    bar.style.width = percentage + '%';
+                }, 100);
+            });
+        }
+        
+        // Populate data table WITHOUT total outflow and monthly balance columns
+        function populateDataTable() {
+            const tableBody = document.getElementById('data-table-body');
+            tableBody.innerHTML = '';
+            
+            financialData.forEach((item, index) => {
+                const expenses = expenseData[index] || 0;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="month-cell">${item.month}</td>
+                    <td class="year-cell">${item.year}</td>
+                    <td class="amount-cell">${formatCurrency(item.cashReceived)}</td>
+                    <td class="amount-cell">${item.cashRemitted ? formatCurrency(item.cashRemitted) : 'N/A'}</td>
+                    <td class="expense-cell">${formatCurrency(expenses)}</td>
+                    <td><span class="deliveries-cell">${formatNumber(item.deliveries)}</span></td>
+                `;
+                tableBody.appendChild(row);
+            });
+            
+            // Add total row WITHOUT total outflow and balance columns
+            const totalRow = document.createElement('tr');
+            totalRow.style.backgroundColor = '#f0f5ff';
+            totalRow.innerHTML = `
+                <td class="month-cell" style="font-weight: 700;">January to December</td>
+                <td class="year-cell">2025</td>
+                <td class="amount-cell" style="font-size: 1.1rem;">${formatCurrency(totalCashReceived)}</td>
+                <td class="amount-cell" style="font-size: 1.1rem;">${formatCurrency(totalCashRemitted)}</td>
+                <td class="expense-cell" style="font-size: 1.1rem;">${formatCurrency(totalExpenses)}</td>
+                <td><span class="deliveries-cell" style="font-size: 1.1rem;">${formatNumber(totalDeliveries)}</span></td>
+            `;
+            tableBody.appendChild(totalRow);
+        }
+        
+        // Initialize charts
+        function initializeCharts() {
+            const months = financialData.map(item => item.month.substring(0, 3));
+            const cashReceived = financialData.map(item => item.cashReceived / 1000000); // Convert to millions
+            const cashRemitted = financialData.map(item => item.cashRemitted ? item.cashRemitted / 1000000 : null);
+            const deliveries = financialData.map(item => item.deliveries);
+            const expenses = expenseData.map(item => item / 1000000); // Convert to millions
+            
+            // Calculate monthly balances for chart with UPDATED formula
+            const monthlyBalances = financialData.map((item, index) => {
+                const expenses = expenseData[index] || 0;
+                const remitted = item.cashRemitted || 0;
+                const totalOutflow = remitted + expenses;
+                // UPDATED: Balance = (Cash remitted + expenses) - Cash received
+                const balance = totalOutflow - item.cashReceived;
+                
+                return {
+                    totalOutflow: totalOutflow,
+                    balance: balance
+                };
+            });
+            
+            const balances = monthlyBalances.map(item => item.balance / 1000000); // Convert to millions
+            const totalOutflows = monthlyBalances.map(item => item.totalOutflow / 1000000); // Convert to millions
+            
+            // Cash Flow Chart
+            const cashFlowCtx = document.getElementById('cashFlowChart').getContext('2d');
+            new Chart(cashFlowCtx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Cash Received (₦M)',
+                            data: cashReceived,
+                            borderColor: '#1a3a8f',
+                            backgroundColor: 'rgba(26, 58, 143, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Cash Remitted (₦M)',
+                            data: cashRemitted,
+                            borderColor: '#2d5cc2',
+                            backgroundColor: 'rgba(45, 92, 194, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += formatCurrency(context.parsed.y * 1000000);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Amount in Millions (₦)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '₦' + value + 'M';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Deliveries Chart
+            const deliveriesCtx = document.getElementById('deliveriesChart').getContext('2d');
+            new Chart(deliveriesCtx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Deliveries Made',
+                        data: deliveries,
+                        backgroundColor: 'rgba(45, 92, 194, 0.7)',
+                        borderColor: '#1a3a8f',
+                        borderWidth: 2,
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Deliveries'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Expenses Chart
+            const expensesCtx = document.getElementById('expensesChart').getContext('2d');
+            new Chart(expensesCtx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Operating Expenses (₦M)',
+                        data: expenses,
+                        backgroundColor: 'rgba(231, 76, 60, 0.7)',
+                        borderColor: '#c0392b',
+                        borderWidth: 2,
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Operating Expenses: ' + formatCurrency(context.parsed.y * 1000000);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Amount in Millions (₦)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '₦' + value + 'M';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Balance Chart
+            const balanceCtx = document.getElementById('balanceChart').getContext('2d');
+            new Chart(balanceCtx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Cash Received (₦M)',
+                            data: cashReceived,
+                            borderColor: '#1a3a8f',
+                            backgroundColor: 'rgba(26, 58, 143, 0.1)',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Total Outflows (₦M)',
+                            data: totalOutflows,
+                            borderColor: '#e74c3c',
+                            backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Monthly Balance (₦M)',
+                            data: balances,
+                            borderColor: '#27ae60',
+                            backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.3,
+                            borderDash: [5, 5]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += formatCurrency(context.parsed.y * 1000000);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            title: {
+                                display: true,
+                                text: 'Amount in Millions (₦)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '₦' + value + 'M';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // NEW: Coverage Chart
+            const coverageCtx = document.getElementById('coverageChart').getContext('2d');
+            new Chart(coverageCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: locationData.map(loc => loc.name),
+                    datasets: [{
+                        data: locationData.map(loc => loc.percentage),
+                        backgroundColor: locationData.map(loc => loc.color),
+                        borderColor: '#fff',
+                        borderWidth: 2,
+                        hoverOffset: 15
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.parsed}%`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '50%'
+                }
+            });
+        }
+        
+        // Month selection functionality
+        function setupMonthSelector() {
+            const monthButtons = document.querySelectorAll('.month-btn');
+            const monthDetails = document.getElementById('monthDetails');
+            
+            monthButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    monthButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    const month = this.getAttribute('data-month');
+                    
+                    if (month === 'all') {
+                        showAnnualOverview();
+                    } else {
+                        showMonthDetails(month);
+                    }
+                });
+            });
+        }
+        
+        function showAnnualOverview() {
+            const monthDetails = document.getElementById('monthDetails');
+            monthDetails.innerHTML = `
+                <div class="details-title">
+                    <i class="fas fa-calendar-alt"></i>
+                    Annual Overview (January to December 2025)
+                </div>
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">Total Cash Received</div>
+                        <div class="detail-value">${formatCurrency(totalCashReceived)}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Total Cash Remitted</div>
+                        <div class="detail-value">${formatCurrency(totalCashRemitted)}</div>
+                    </div>
+                    <div class="detail-item expense-detail-item">
+                        <div class="detail-label">Total Operating Expenses</div>
+                        <div class="detail-value">${formatCurrency(totalExpenses)}</div>
+                    </div>
+                    <div class="detail-item profit-detail-item">
+                        <div class="detail-label">Net Operational Balance</div>
+                        <div class="detail-value">${formatCurrency(netBalance)}</div>
+                    </div>
+                    <div class="detail-item location-detail-item">
+                        <div class="detail-label">States Covered</div>
+                        <div class="detail-value">6 States</div>
+                    </div>
+                    <div class="detail-item location-detail-item">
+                        <div class="detail-label">Primary Coverage</div>
+                        <div class="detail-value">Delta (68%)</div>
+                    </div>
+                </div>
+            `;
+            monthDetails.classList.add('active');
+        }
+        
+        function showMonthDetails(monthCode) {
+            const monthMap = {
+                jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5,
+                jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11
+            };
+            
+            const index = monthMap[monthCode];
+            const monthData = financialData[index];
+            const expenses = expenseData[index];
+            const remitted = monthData.cashRemitted || 0;
+            const totalOutflow = remitted + expenses;
+            // UPDATED: Balance = (Cash remitted + expenses) - Cash received
+            const balance = totalOutflow - monthData.cashReceived;
+            
+            const monthDetails = document.getElementById('monthDetails');
+            monthDetails.innerHTML = `
+                <div class="details-title">
+                    <i class="fas fa-calendar-day"></i>
+                    ${monthData.month} 2025 Details
+                </div>
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">Cash Received</div>
+                        <div class="detail-value">${formatCurrency(monthData.cashReceived)}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Cash Remitted</div>
+                        <div class="detail-value">${monthData.cashRemitted ? formatCurrency(monthData.cashRemitted) : 'N/A'}</div>
+                    </div>
+                    <div class="detail-item expense-detail-item">
+                        <div class="detail-label">Operating Expenses</div>
+                        <div class="detail-value">${formatCurrency(expenses)}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Total Outflows</div>
+                        <div class="detail-value">${formatCurrency(totalOutflow)}</div>
+                    </div>
+                    <div class="detail-item ${balance >= 0 ? 'profit-detail-item' : 'expense-detail-item'}">
+                        <div class="detail-label">Monthly Balance</div>
+                        <div class="detail-value">${formatCurrency(balance)}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Deliveries Made</div>
+                        <div class="detail-value">${formatNumber(monthData.deliveries)}</div>
+                    </div>
+                </div>
+            `;
+            monthDetails.classList.add('active');
+        }
+        
+        // Initialize the dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            populateDataTable();
+            initializeCharts();
+            animateProgressBars();
+            setupMonthSelector();
+            showAnnualOverview();
+        });
+    </script>
+</body>
+</html>
